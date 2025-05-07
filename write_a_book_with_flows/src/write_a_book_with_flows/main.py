@@ -15,17 +15,17 @@ from write_a_book_with_flows.crews.outline_book_crew.outline_crew import Outline
 
 class BookState(BaseModel):
     id: str = "1"
-    title: str = "The Current State of AI in September 2024"
+    title: str = "2024年北京数字政通科技股份有限公司发展概况"
     book: List[Chapter] = []
     book_outline: List[ChapterOutline] = []
     topic: str = (
-        "Exploring the latest trends in AI across different industries as of September 2024"
+        "分析北京数字政通科技股份有限公司在2024年的业务发展、技术创新、市场表现及面临的挑战"
     )
     goal: str = """
-        The goal of this book is to provide a comprehensive overview of the current state of artificial intelligence in September 2024.
-        It will delve into the latest trends impacting various industries, analyze significant advancements,
-        and discuss potential future developments. The book aims to inform readers about cutting-edge AI technologies
-        and prepare them for upcoming innovations in the field.
+        本书旨在全面回顾和分析北京数字政通科技股份有限公司在2024年的发展情况。
+        内容将涵盖公司在智慧城市、数字治理等领域的主要业务进展，技术创新成果，
+        以及在市场竞争中的表现和所面临的挑战。通过深入探讨公司的战略布局和未来发展方向，
+        为读者提供对数字政通公司运营状况的全面了解，并为相关领域的研究和实践提供参考。
     """
 
 

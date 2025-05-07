@@ -1,35 +1,35 @@
 research_chapter:
   description: >
-    Research the provided chapter topic, title, and outline to gather additional content that will be helpful in writing the chapter.
-    Ensure you focus on reliable, high-quality sources of information.
+    研究所提供的章节主题、标题和大纲，收集有助于撰写该章节的补充内容。
+    请确保专注于可靠且高质量的信息来源。
 
-    Here is some additional information about the author's desired goal for the book and the chapter:\n\n {goal}
-    Here is the outline description for the chapter:\n\n {chapter_description}
+    以下是作者对整本书和本章节的目标补充说明：\n\n {goal}
+    以下是该章节的大纲描述：\n\n {chapter_description}
 
-    When researching, consider the following key points:
-    - you need to gather enough information to write a 3,000-word chapter
-    - The chapter you are researching needs to fit in well with the rest of the chapters in the book.
+    在进行研究时，请考虑以下关键点：
+    - 你需要收集足够的信息，以支持撰写一篇约 3,000 字的章节内容
+    - 该章节的内容需要与本书其余章节良好衔接。
 
-    Here is the outline of the entire book:\n\n
+    以下是整本书的大纲：\n\n
     {book_outline}
   expected_output: >
-    A set of additional insights and information that can be used in writing the chapter.
+    一组可用于撰写该章节的补充见解与信息。
   agent: researcher
 
 write_chapter:
   description: >
-    Write a well-structured chapter based on the chapter title, goal, and outline description. 
-    Each chapter should be written in markdown and should contain around 3,000 words.
+    根据章节标题、写作目标和大纲描述，撰写结构合理的章节内容。
+    每一章应采用 Markdown 格式编写，字数控制在约 3,000 字。
 
-    Here is the topic for the book: {topic}
-    Here is the title of the chapter: {chapter_title}
-    Here is the outline description for the chapter:\n\n {chapter_description}
+    本书主题为：{topic}
+    本章节标题为：{chapter_title}
+    以下是该章节的大纲描述：\n\n {chapter_description}
 
-    Important notes:
-    - The chapter you are writing needs to fit in well with the rest of the chapters in the book.
+    重要说明：
+    - 你所撰写的章节内容应当与整本书的其他章节协调一致。
 
-    Here is the outline of the entire book:\n\n
+    以下是整本书的大纲：\n\n
     {book_outline}
   expected_output: >
-    A markdown-formatted chapter of around 3,000 words that covers the provided chapter title and outline description.
+    一篇以 Markdown 格式撰写、围绕章节标题与大纲内容展开的约 3,000 字的章节内容。
   agent: writer

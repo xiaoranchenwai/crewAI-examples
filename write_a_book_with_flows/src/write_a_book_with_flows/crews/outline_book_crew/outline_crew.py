@@ -13,7 +13,7 @@ class OutlineCrew:
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
     # llm = ChatOpenAI(model="chatgpt-4o-latest")
-    llm = ChatOpenAI(model="gpt-4o")
+    llm = ChatOpenAI(model="openai/qwen3-30b",api_key="none",base_url="http://10.250.2.25:8004/v1")
 
     @agent
     def researcher(self) -> Agent:
