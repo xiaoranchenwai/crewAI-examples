@@ -2,7 +2,10 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from langchain_openai import ChatOpenAI
 from mcp import StdioServerParameters
+from crewai_tools import SQLQueryTool
 from crewai_tools import MCPServerAdapter
+from crewai_tools import EnhancedMCPServerAdapter
+from crewai_tools import SerperDevTool
 
 from pingshan_hotline_report.types import ChartData
 
@@ -20,14 +23,24 @@ class DataAnalysisCrew:
         """Create the data analyst agent with MySQL query tool"""
         # Set up MySQL MCP server adapter
         #mysql_serverparams = {url="http://10.250.2.23:8030/sse"}
+        #sql_tool = SQLQueryTool()
+        # search_tool = SerperDevTool()
+        # return Agent(
+        #     config=self.agents_config["data_analyst"],
+        #     tools=[search_tool],
+        #     llm=self.llm,
+        #     verbose=True,
+        # )
         mysql_serverparams = {"url": "http://10.250.2.23:8030/sse"}
         with MCPServerAdapter(mysql_serverparams) as tools:
             return Agent(
-                config=self.agents_config["data_analyst"],
-                tools=tools,
-                llm=self.llm,
-                verbose=True,
-            )
+                    config=self.agents_config["data_analyst"],
+                    memory = True,
+                    allow_delegation = True,
+                    tools= [tools[0]],
+                    llm=self.llm,
+                    verbose=True,
+                )
 
     @agent
     def visualization_expert(self) -> Agent:
@@ -38,7 +51,7 @@ class DataAnalysisCrew:
         with MCPServerAdapter(quickchart_serverparams) as tools:
             return Agent(
                 config=self.agents_config["visualization_expert"],
-                tools=tools,
+                tools=[tools[0]],
                 llm=self.llm,
                 verbose=True,
             )
