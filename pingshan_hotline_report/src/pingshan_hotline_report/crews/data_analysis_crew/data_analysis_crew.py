@@ -16,7 +16,7 @@ class DataAnalysisCrew:
 
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
-    llm = ChatOpenAI(model="openai/qwen3-235b", api_key="none", base_url="http://10.250.2.26:8004/v1")
+    llm = ChatOpenAI(model="openai/qwen3-32b", api_key="none", base_url="http://10.250.2.26:8004/v1")
 
     @agent
     def data_analyst(self) -> Agent:

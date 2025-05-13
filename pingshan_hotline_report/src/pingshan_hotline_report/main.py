@@ -43,10 +43,13 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
         })
 
         # Store SQL query results and chart data for use in report generation
-        self.state.sql_results = output.get("sql_results", {})
-        self.state.chart_data = output.get("chart_data", [])
+        # self.state.sql_results = output.get("sql_results", {})
+        # self.state.chart_data = output.get("chart_data", [])
         
-        print(f"数据分析完成，获取到 {len(self.state.chart_data)} 个图表")
+        self.state.sql_results = output.tasks_output[0].raw
+        self.state.chart_data = output.tasks_output[1].raw
+        
+        #print(f"数据分析完成，获取到 {len(self.state.chart_data)} 个图表")
         return self.state.sql_results
 
     @listen(analyze_hotline_data)
@@ -64,14 +67,15 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
         })
         
         # Store the generated report sections
-        self.state.report_sections = output.get("report_sections", [])
+        #self.state.report_sections = output.get("report_sections", [])
+        self.state.report_sections = output.raw
         
         # Create the full report
         self.state.report = MonthlyReport(
             title=f"{self.state.year}年{self.state.month}月坪山热线系统分析报告",
             month=self.state.month,
             year=self.state.year,
-            summary=output.get("summary", ""),
+            summary=output.tasks_output[0].summary,
             sections=self.state.report_sections,
             creation_date=datetime.now()
         )

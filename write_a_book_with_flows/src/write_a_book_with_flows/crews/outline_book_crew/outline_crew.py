@@ -2,6 +2,7 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool
 from langchain_openai import ChatOpenAI
+from crewai_tools import MCPServerAdapter
 
 from write_a_book_with_flows.types import BookOutline
 
@@ -13,17 +14,26 @@ class OutlineCrew:
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
     # llm = ChatOpenAI(model="chatgpt-4o-latest")
-    llm = ChatOpenAI(model="openai/qwen3-30b",api_key="none",base_url="http://10.250.2.25:8004/v1")
+    llm = ChatOpenAI(model="openai/qwen3-32b",api_key="none",base_url="http://10.250.2.25:8004/v1")
 
     @agent
     def researcher(self) -> Agent:
-        search_tool = SerperDevTool()
-        return Agent(
-            config=self.agents_config["researcher"],
-            tools=[search_tool],
-            llm=self.llm,
-            verbose=True,
-        )
+        mysql_serverparams = {"url": "http://10.250.2.23:8030/sse"}
+        with MCPServerAdapter(mysql_serverparams) as tools:
+             return Agent(
+                    config=self.agents_config["researcher"],
+                    allow_delegation = True,
+                    tools= [tools[0]],
+                    llm=self.llm,
+                    verbose=True,
+                )
+        # search_tool = SerperDevTool()
+        # return Agent(
+        #     config=self.agents_config["researcher"],
+        #     tools=[search_tool],
+        #     llm=self.llm,
+        #     verbose=True,
+        # )
 
     @agent
     def outliner(self) -> Agent:
