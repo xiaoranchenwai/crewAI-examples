@@ -60,28 +60,41 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
         # Run the data analysis crew to get all query results
         output = DataAnalysisCrew().crew().kickoff()
         
-        # Extract the district event statistics
-        district_stats = output.get("district_event_stats", {})
-        if district_stats and hasattr(district_stats, "district_data"):
-            self.state.district_stats = district_stats.district_data
-        
-        # Extract electric vehicle violations
-        ev_violations = output.get("electric_vehicle_violations", {})
-        if ev_violations and hasattr(ev_violations, "communities"):
-            self.state.ev_violations = ev_violations.communities
-        
-        # Extract garbage exposure statistics
-        garbage_stats = output.get("garbage_exposure_stats", {})
-        if garbage_stats and hasattr(garbage_stats, "community_data"):
-            self.state.garbage_stats = garbage_stats.community_data
-        
-        # Extract garbage sources
-        garbage_sources = output.get("garbage_sources", {})
-        if garbage_sources and hasattr(garbage_sources, "source_data"):
-            self.state.garbage_sources = garbage_sources.source_data
-        
-        # Extract interpretation
-        self.state.data_interpretation = output.get("interpret_results", "")
+        # 检查任务输出结果存在
+        if hasattr(output, 'tasks_output') and output.tasks_output:
+            # 任务输出是一个列表，每个任务的结果按索引访问
+            
+            # 提取第1个任务：district_event_stats的结果
+            if len(output.tasks_output) > 0 and hasattr(output.tasks_output[0], 'pydantic'):
+                district_stats = output.tasks_output[0].pydantic
+                if hasattr(district_stats, "district_data"):
+                    self.state.district_stats = district_stats.district_data
+            
+            # 提取第2个任务：electric_vehicle_violations的结果
+            if len(output.tasks_output) > 1 and hasattr(output.tasks_output[1], 'pydantic'):
+                ev_violations = output.tasks_output[1].pydantic
+                if hasattr(ev_violations, "communities"):
+                    self.state.ev_violations = ev_violations.communities
+            
+            # 提取第3个任务：garbage_exposure_stats的结果
+            if len(output.tasks_output) > 2 and hasattr(output.tasks_output[2], 'pydantic'):
+                garbage_stats = output.tasks_output[2].pydantic
+                if hasattr(garbage_stats, "community_data"):
+                    self.state.garbage_stats = garbage_stats.community_data
+            
+            # 提取第4个任务：garbage_sources的结果
+            if len(output.tasks_output) > 3 and hasattr(output.tasks_output[3], 'pydantic'):
+                garbage_sources = output.tasks_output[3].pydantic
+                if hasattr(garbage_sources, "source_data"):
+                    self.state.garbage_sources = garbage_sources.source_data
+            
+            # 提取第5个任务：interpret_results的结果（可能没有pydantic模型）
+            if len(output.tasks_output) > 4:
+                # 对于没有pydantic模型的任务，使用raw或其他可用字段
+                if hasattr(output.tasks_output[4], 'raw'):
+                    self.state.data_interpretation = output.tasks_output[4].raw
+                else:
+                    self.state.data_interpretation = str(output.tasks_output[4])
         
         print("Data Analysis completed")
         return output
@@ -94,32 +107,41 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
         viz_crew = VisualizationCrew()
         
         # District events chart
-        district_chart = viz_crew.crew().kickoff(
+        district_chart_result = viz_crew.crew().kickoff(
             tasks=[viz_crew.create_district_chart],
             inputs={"district_data": self.state.district_stats}
         )
-        self.state.district_chart = district_chart.get("create_district_chart")
+        # 从任务输出列表中提取结果
+        if hasattr(district_chart_result, 'tasks_output') and len(district_chart_result.tasks_output) > 0:
+            if hasattr(district_chart_result.tasks_output[0], 'pydantic'):
+                self.state.district_chart = district_chart_result.tasks_output[0].pydantic
         
         # EV violations chart
-        ev_chart = viz_crew.crew().kickoff(
+        ev_chart_result = viz_crew.crew().kickoff(
             tasks=[viz_crew.create_ev_violations_chart],
             inputs={"communities": self.state.ev_violations}
         )
-        self.state.ev_violations_chart = ev_chart.get("create_ev_violations_chart")
+        if hasattr(ev_chart_result, 'tasks_output') and len(ev_chart_result.tasks_output) > 0:
+            if hasattr(ev_chart_result.tasks_output[0], 'pydantic'):
+                self.state.ev_violations_chart = ev_chart_result.tasks_output[0].pydantic
         
         # Garbage stats chart
-        garbage_chart = viz_crew.crew().kickoff(
+        garbage_chart_result = viz_crew.crew().kickoff(
             tasks=[viz_crew.create_garbage_stats_chart],
             inputs={"community_data": self.state.garbage_stats}
         )
-        self.state.garbage_stats_chart = garbage_chart.get("create_garbage_stats_chart")
+        if hasattr(garbage_chart_result, 'tasks_output') and len(garbage_chart_result.tasks_output) > 0:
+            if hasattr(garbage_chart_result.tasks_output[0], 'pydantic'):
+                self.state.garbage_stats_chart = garbage_chart_result.tasks_output[0].pydantic
         
         # Garbage sources chart
-        sources_chart = viz_crew.crew().kickoff(
+        sources_chart_result = viz_crew.crew().kickoff(
             tasks=[viz_crew.create_garbage_sources_chart],
             inputs={"source_data": self.state.garbage_sources}
         )
-        self.state.garbage_sources_chart = sources_chart.get("create_garbage_sources_chart")
+        if hasattr(sources_chart_result, 'tasks_output') and len(sources_chart_result.tasks_output) > 0:
+            if hasattr(sources_chart_result.tasks_output[0], 'pydantic'):
+                self.state.garbage_sources_chart = sources_chart_result.tasks_output[0].pydantic
         
         print("Visualizations created")
 
@@ -131,7 +153,7 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
         interpretation = self.state.data_interpretation
         
         # Write section 1
-        section1 = viz_crew.crew().kickoff(
+        section1_result = viz_crew.crew().kickoff(
             tasks=[viz_crew.write_report_section_1],
             inputs={
                 "district_data": self.state.district_stats,
@@ -139,10 +161,12 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
                 "interpretation": interpretation
             }
         )
-        self.state.section_1 = section1.get("write_report_section_1")
+        if hasattr(section1_result, 'tasks_output') and len(section1_result.tasks_output) > 0:
+            if hasattr(section1_result.tasks_output[0], 'pydantic'):
+                self.state.section_1 = section1_result.tasks_output[0].pydantic
         
         # Write section 2
-        section2 = viz_crew.crew().kickoff(
+        section2_result = viz_crew.crew().kickoff(
             tasks=[viz_crew.write_report_section_2],
             inputs={
                 "communities": self.state.ev_violations,
@@ -150,10 +174,12 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
                 "interpretation": interpretation
             }
         )
-        self.state.section_2 = section2.get("write_report_section_2")
+        if hasattr(section2_result, 'tasks_output') and len(section2_result.tasks_output) > 0:
+            if hasattr(section2_result.tasks_output[0], 'pydantic'):
+                self.state.section_2 = section2_result.tasks_output[0].pydantic
         
         # Write section 3
-        section3 = viz_crew.crew().kickoff(
+        section3_result = viz_crew.crew().kickoff(
             tasks=[viz_crew.write_report_section_3],
             inputs={
                 "community_data": self.state.garbage_stats,
@@ -161,10 +187,12 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
                 "interpretation": interpretation
             }
         )
-        self.state.section_3 = section3.get("write_report_section_3")
+        if hasattr(section3_result, 'tasks_output') and len(section3_result.tasks_output) > 0:
+            if hasattr(section3_result.tasks_output[0], 'pydantic'):
+                self.state.section_3 = section3_result.tasks_output[0].pydantic
         
         # Write section 4
-        section4 = viz_crew.crew().kickoff(
+        section4_result = viz_crew.crew().kickoff(
             tasks=[viz_crew.write_report_section_4],
             inputs={
                 "source_data": self.state.garbage_sources,
@@ -172,7 +200,9 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
                 "interpretation": interpretation
             }
         )
-        self.state.section_4 = section4.get("write_report_section_4")
+        if hasattr(section4_result, 'tasks_output') and len(section4_result.tasks_output) > 0:
+            if hasattr(section4_result.tasks_output[0], 'pydantic'):
+                self.state.section_4 = section4_result.tasks_output[0].pydantic
         
         print("Report sections completed")
 
@@ -183,7 +213,7 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
         viz_crew = VisualizationCrew()
         
         # Compile final report
-        final_report = viz_crew.crew().kickoff(
+        final_report_result = viz_crew.crew().kickoff(
             tasks=[viz_crew.compile_final_report],
             inputs={
                 "section_1": self.state.section_1,
@@ -192,7 +222,9 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
                 "section_4": self.state.section_4,
             }
         )
-        self.state.final_report = final_report.get("compile_final_report")
+        if hasattr(final_report_result, 'tasks_output') and len(final_report_result.tasks_output) > 0:
+            if hasattr(final_report_result.tasks_output[0], 'pydantic'):
+                self.state.final_report = final_report_result.tasks_output[0].pydantic
         
         # Save the report to a file
         report_date = datetime.now().strftime("%Y%m%d")
