@@ -66,16 +66,58 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
             "chart_data": self.state.chart_data,
         })
         
-        # Store the generated report sections
-        #self.state.report_sections = output.get("report_sections", [])
-        self.state.report_sections = output.raw
+        # 解析输出结果
+        interpret_data_output = output.tasks_output[0].raw
+        report_output = output.tasks_output[1].raw
         
-        # Create the full report
+        # 创建报告章节
+        # 假设 report_output 包含了一个结构化的报告数据
+        # 需要将其转换为 ReportSection 对象列表
+        self.state.report_sections = []
+        
+        # 这里需要根据实际输出格式解析报告内容
+        # 示例：假设 report_output 是一个包含各章节的字典
+        if isinstance(report_output, dict) and "sections" in report_output:
+            for section in report_output["sections"]:
+                # 确保每个章节都有标题和内容
+                if "title" in section and "content" in section:
+                    charts = []
+                    if "charts" in section and section["charts"]:
+                        for chart_data in section["charts"]:
+                            charts.append(ChartData(**chart_data))
+                    
+                    self.state.report_sections.append(
+                        ReportSection(
+                            title=section["title"],
+                            content=section["content"],
+                            charts=charts
+                        )
+                    )
+        
+        # 如果输出不是预期的格式，创建一个默认章节
+        if not self.state.report_sections:
+            self.state.report_sections = [
+                ReportSection(
+                    title="报告内容",
+                    content=str(report_output),
+                    charts=[]
+                )
+            ]
+        
+        # 获取报告摘要
+        summary = ""
+        if isinstance(interpret_data_output, dict) and "summary" in interpret_data_output:
+            summary = interpret_data_output["summary"]
+        else:
+            # 如果没有找到摘要，使用默认文本
+            summary = "这是一份坪山热线系统的月度分析报告，包含了系统运行情况的关键指标和分析。"
+        
+        # 创建完整报告
         self.state.report = MonthlyReport(
             title=f"{self.state.year}年{self.state.month}月坪山热线系统分析报告",
             month=self.state.month,
             year=self.state.year,
-            summary=output.tasks_output[0].summary,
+            summary=summary,
             sections=self.state.report_sections,
             creation_date=datetime.now()
         )

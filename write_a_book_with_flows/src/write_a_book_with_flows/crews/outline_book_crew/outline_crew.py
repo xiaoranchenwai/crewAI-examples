@@ -18,22 +18,22 @@ class OutlineCrew:
 
     @agent
     def researcher(self) -> Agent:
-        mysql_serverparams = {"url": "http://10.250.2.23:8030/sse"}
-        with MCPServerAdapter(mysql_serverparams) as tools:
-             return Agent(
-                    config=self.agents_config["researcher"],
-                    allow_delegation = True,
-                    tools= [tools[0]],
-                    llm=self.llm,
-                    verbose=True,
-                )
-        # search_tool = SerperDevTool()
-        # return Agent(
-        #     config=self.agents_config["researcher"],
-        #     tools=[search_tool],
-        #     llm=self.llm,
-        #     verbose=True,
-        # )
+        # mysql_serverparams = {"url": "http://10.250.2.23:8030/sse"}
+        # with MCPServerAdapter(mysql_serverparams) as tools:
+        #      return Agent(
+        #             config=self.agents_config["researcher"],
+        #             allow_delegation = True,
+        #             tools= [tools[0]],
+        #             llm=self.llm,
+        #             verbose=True,
+        #         )
+        search_tool = SerperDevTool()
+        return Agent(
+            config=self.agents_config["researcher"],
+            tools=[search_tool],
+            llm=self.llm,
+            verbose=True,
+        )
 
     @agent
     def outliner(self) -> Agent:

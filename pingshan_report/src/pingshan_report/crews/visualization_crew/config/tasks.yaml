@@ -1,0 +1,159 @@
+create_district_chart:
+  description: >
+    利用QuickChart工具，根据各街道事件数量统计数据创建一个条形图。
+    图表应清晰展示各街道事件数量的对比，并按降序排列。
+    
+    确保图表具有以下特征：
+    - 使用鲜明但专业的颜色
+    - 包含清晰的标题和轴标签
+    - 条形标签显示具体数值
+    - 适当的尺寸，便于嵌入报告
+    
+    输入数据格式为：{district_data}
+  expected_output: >
+    一个展示各街道事件数量统计的条形图URL和相应的描述文本。
+  agent: chart_designer
+
+create_ev_violations_chart:
+  description: >
+    利用QuickChart工具，根据存在电动车违规问题的社区列表创建一个饼图。
+    图表应清晰展示不同社区电动车违规问题的分布情况。
+    
+    确保图表具有以下特征：
+    - 使用鲜明但专业的颜色
+    - 包含清晰的标题和图例
+    - 显示各部分的百分比
+    - 适当的尺寸，便于嵌入报告
+    
+    输入数据格式为：{communities}
+  expected_output: >
+    一个展示电动车违规问题社区分布的饼图URL和相应的描述文本。
+  agent: chart_designer
+
+create_garbage_stats_chart:
+  description: >
+    利用QuickChart工具，根据各社区暴露垃圾问题数量统计创建一个条形图。
+    图表应清晰展示各社区垃圾问题数量的对比，并按数量降序排列。
+    
+    确保图表具有以下特征：
+    - 使用鲜明但专业的颜色
+    - 包含清晰的标题和轴标签
+    - 条形标签显示具体数值
+    - 适当的尺寸，便于嵌入报告
+    
+    输入数据格式为：{community_data}
+  expected_output: >
+    一个展示各社区暴露垃圾问题数量的条形图URL和相应的描述文本。
+  agent: chart_designer
+
+create_garbage_sources_chart:
+  description: >
+    利用QuickChart工具，根据暴露垃圾事件主要来源统计创建一个饼图。
+    图表应清晰展示不同来源的占比情况。
+    
+    确保图表具有以下特征：
+    - 使用鲜明但专业的颜色
+    - 包含清晰的标题和图例
+    - 显示各部分的百分比
+    - 适当的尺寸，便于嵌入报告
+    
+    输入数据格式为：{source_data}
+  expected_output: >
+    一个展示暴露垃圾事件主要来源的饼图URL和相应的描述文本。
+  agent: chart_designer
+
+write_report_section_1:
+  description: >
+    根据各街道事件数量统计分析和对应图表，撰写报告第一部分。
+    内容应包括：
+    - 统计结果的概述
+    - 事件分布的主要趋势
+    - 重点关注的高事件街道
+    - 可能的原因分析
+    - 建议的行动方案
+    
+    确保内容清晰、简洁，与图表内容相互呼应，便于决策者理解。
+    
+    输入数据：
+    - 统计数据：{district_data}
+    - 图表：{chart_data}
+    - 数据解读：{interpretation}
+  expected_output: >
+    一个包含标题、正文内容和图表引用的报告章节。
+  agent: report_writer
+
+write_report_section_2:
+  description: >
+    根据电动车违规问题社区分析和对应图表，撰写报告第二部分。
+    内容应包括：
+    - 电动车违规问题的概述
+    - 重点问题社区的分析
+    - 可能的原因和影响
+    - 针对性的解决建议
+    
+    确保内容清晰、简洁，与图表内容相互呼应，便于决策者理解。
+    
+    输入数据：
+    - 统计数据：{communities}
+    - 图表：{chart_data}
+    - 数据解读：{interpretation}
+  expected_output: >
+    一个包含标题、正文内容和图表引用的报告章节。
+  agent: report_writer
+
+write_report_section_3:
+  description: >
+    根据各社区暴露垃圾问题数量统计和对应图表，撰写报告第三部分。
+    内容应包括：
+    - 垃圾问题的总体情况
+    - 问题严重社区的具体分析
+    - 垃圾问题的可能原因
+    - 改善环境卫生的建议措施
+    
+    确保内容清晰、简洁，与图表内容相互呼应，便于决策者理解。
+    
+    输入数据：
+    - 统计数据：{community_data}
+    - 图表：{chart_data}
+    - 数据解读：{interpretation}
+  expected_output: >
+    一个包含标题、正文内容和图表引用的报告章节。
+  agent: report_writer
+
+write_report_section_4:
+  description: >
+    根据暴露垃圾事件主要来源统计和对应图表，撰写报告第四部分。
+    内容应包括：
+    - 垃圾事件来源的总体分布
+    - 主要来源类型的分析
+    - 不同来源的影响比较
+    - 针对主要来源的治理建议
+    
+    确保内容清晰、简洁，与图表内容相互呼应，便于决策者理解。
+    
+    输入数据：
+    - 统计数据：{source_data}
+    - 图表：{chart_data}
+    - 数据解读：{interpretation}
+  expected_output: >
+    一个包含标题、正文内容和图表引用的报告章节。
+  agent: report_writer
+
+compile_final_report:
+  description: >
+    整合四个报告章节，编写报告的引言和结论部分，完成最终的坪山热线报告。
+    报告应包含：
+    - 引言：介绍报告背景、目的和数据来源
+    - 四个核心章节：按顺序整合已完成的章节内容
+    - 结论：总结主要发现和建议，提出下一步行动计划
+    
+    确保报告格式统一，结构清晰，便于阅读和理解。
+    
+    输入数据：
+    - 报告章节1：{section_1}
+    - 报告章节2：{section_2}
+    - 报告章节3：{section_3}
+    - 报告章节4：{section_4}
+  expected_output: >
+    一份完整的坪山热线报告，包含引言、四个核心章节和结论。
+  agent: report_writer
