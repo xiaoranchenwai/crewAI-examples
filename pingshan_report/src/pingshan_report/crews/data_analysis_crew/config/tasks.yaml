@@ -1,59 +1,31 @@
 district_event_stats:
   description: >
-    使用SQL查询工具，按街道名称统计事件数量并按数量降序排序。
-    请构建一个查询语句，从数据库中提取每个街道的事件总数，并按照事件数量从高到低排列。
-    确保查询结果格式清晰，包含街道名称和对应的事件数量。
+    使用SQL查询工具generate_execute_sql查询：按街道名称统计事件数量并按数量降序排序。
     
-    假设数据库有以下表结构：
-    - events: 包含事件ID、类型、地点等信息
-    - districts: 包含街道和社区信息
-    
-    注意：确保SQL语句在执行前经过验证，避免语法错误。
   expected_output: >
     一个包含各街道事件数量统计（按数量降序排列）的结果集，格式为字典结构。
   agent: sql_analyst
 
 electric_vehicle_violations:
   description: >
-    使用SQL查询工具，找出存在电动车违规问题的社区。
-    请构建一个查询语句，从数据库中提取所有报告了电动车违规问题的社区名称。
-    确保查询结果格式清晰，仅包含有此类问题的社区列表。
-    
-    假设数据库有以下表结构：
-    - events: 包含事件ID、类型、地点等信息
-    - communities: 包含社区详细信息
-    
-    注意：在查询中使用适当的过滤条件，精确筛选电动车违规类型的事件。
+    使用SQL查询工具generate_execute_sql查询：找出存在电动车违规问题的社区。
+
   expected_output: >
     一个包含所有存在电动车违规问题的社区名称列表。
   agent: sql_analyst
 
 garbage_exposure_stats:
   description: >
-    使用SQL查询工具，统计各社区暴露垃圾问题的数量。
-    请构建一个查询语句，从数据库中提取每个社区报告的暴露垃圾问题数量。
-    确保查询结果格式清晰，包含社区名称和对应的垃圾问题数量。
+    使用SQL查询工具generate_execute_sql查询：统计各社区暴露垃圾问题的数量。
     
-    假设数据库有以下表结构：
-    - events: 包含事件ID、类型、地点等信息
-    - communities: 包含社区详细信息
-    
-    注意：在查询中确保正确筛选暴露垃圾类型的事件，并按社区进行分组计数。
   expected_output: >
     一个包含各社区暴露垃圾问题数量统计的结果集，格式为字典结构。
   agent: sql_analyst
 
 garbage_sources:
   description: >
-    使用SQL查询工具，分析暴露垃圾事件的主要来源。
-    请构建一个查询语句，从数据库中提取暴露垃圾事件的各种来源及其数量统计。
-    确保查询结果格式清晰，包含来源类型和对应的事件数量。
+    使用SQL查询工具generate_execute_sql查询：暴露垃圾事件的主要来源。
     
-    假设数据库有以下表结构：
-    - events: 包含事件ID、类型、地点、来源等信息
-    - sources: 包含来源详细信息
-    
-    注意：在查询中确保正确筛选暴露垃圾类型的事件，并按来源进行分组计数。
   expected_output: >
     一个包含暴露垃圾事件各来源数量统计的结果集，格式为字典结构。
   agent: sql_analyst

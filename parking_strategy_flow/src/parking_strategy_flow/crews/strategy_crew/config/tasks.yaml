@@ -1,0 +1,52 @@
+design_pricing_strategy:
+  description: >
+    基于研究结果，设计一套完整的停车场动态调价策略。策略应包括以下内容：
+    1. 分时段调价方案（高峰、平峰、闲时等不同时段的具体价格设定）
+    2. 分区域差异化定价（核心区、边缘区等不同区域的价格差异）
+    3. 用户分层权益设计（高频用户、临时用户等不同群体的差异化方案）
+    4. 价格弹性系数和收益预测
+    
+    策略设计应基于以下研究结果：
+    市场分析：{market_analysis}
+    用户行为分析：{user_behavior}
+    定价模型分析：{pricing_models}
+    
+    请针对以下具体问题提供解决方案：{question}
+  expected_output: >
+    一份详细的停车场动态调价策略，包括具体价格设定、收益预测和实施建议。
+  agent: pricing_strategist
+
+assess_risks:
+  description: >
+    评估动态调价策略的实施风险，并设计相应的控制措施。重点关注以下方面：
+    1. 用户抵触风险（价格调整引发的负面反应）
+    2. 数据异常风险（系统故障、数据偏差等情况）
+    3. 竞争对手反制风险（周边停车场的价格应对）
+    4. 应急响应机制设计
+    
+    风险评估应基于以下研究结果：
+    市场分析：{market_analysis}
+    用户行为分析：{user_behavior}
+    
+    请针对以下具体问题提供风险控制方案：{question}
+  expected_output: >
+    一份停车场动态调价策略的风险评估报告和控制措施方案。
+  agent: risk_analyst
+
+design_implementation:
+  description: >
+    设计停车场动态调价策略的具体实施方案。方案应包括以下内容：
+    1. 实施步骤和时间表
+    2. 技术系统需求和部署方案
+    3. 数据采集和分析流程
+    4. 测试验证和优化机制
+    
+    实施方案应基于以下研究结果和策略设计：
+    定价策略：{pricing_strategy}
+    风险控制：{risk_assessment}
+    案例参考：{case_studies}
+    
+    请针对以下具体问题提供实施方案：{question}
+  expected_output: >
+    一份详细的停车场动态调价策略实施方案，包括步骤、技术需求和优化机制。
+  agent: implementation_expert

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import asyncio
-from typing import Dict, List, Any
+from typing import Dict, List
 from datetime import datetime
-from pydantic import Field
+
 from crewai.flow.flow import Flow, listen, start
 from pydantic import BaseModel
 
@@ -11,12 +11,6 @@ from pingshan_report.crews.data_analysis_crew.data_analysis_crew import (
 )
 from pingshan_report.crews.visualization_crew.visualization_crew import (
     VisualizationCrew,
-)
-from pingshan_report.crews.report_writing_crew.report_writing_crew import (
-    ReportWritingCrew,
-)
-from pingshan_report.crews.report_writing_final.report_writing_final import (
-    ReportWritingFinalCrew,
 )
 from pingshan_report.types import (
     DistrictEventStats,
@@ -41,18 +35,16 @@ class ReportState(BaseModel):
     data_interpretation: str = ""
     
     # Chart data
-    #district_chart: ChartData = None
-    district_chart: Dict[str, Any] = Field(default_factory=dict)
-    ev_violations_chart: Dict[str, Any] = Field(default_factory=dict)
-    garbage_stats_chart: Dict[str, Any] = Field(default_factory=dict)
-    garbage_sources_chart: Dict[str, Any] = Field(default_factory=dict)
+    district_chart: ChartData = None
+    ev_violations_chart: ChartData = None
+    garbage_stats_chart: ChartData = None
+    garbage_sources_chart: ChartData = None
     
     # Report sections
-    #section_1: ReportSection = None
-    section_1: Dict[str, Any] = Field(default_factory=dict)
-    section_2: Dict[str, Any] = Field(default_factory=dict)
-    section_3: Dict[str, Any] = Field(default_factory=dict)
-    section_4: Dict[str, Any] = Field(default_factory=dict)
+    section_1: ReportSection = None
+    section_2: ReportSection = None
+    section_3: ReportSection = None
+    section_4: ReportSection = None
     
     # Final report
     final_report: PingshanReport = None
@@ -114,6 +106,10 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
         # Create charts for all analysis results
         viz_crew = VisualizationCrew()
         
+         # District events chart
+        # district_chart_task = viz_crew.create_district_chart()
+        # district_chart_task.context = {"district_data": self.state.district_stats}
+        # district_chart_result = viz_crew.crew().kickoff([district_chart_task])
         # District events chart
         district_chart_result = viz_crew.crew().kickoff(
             inputs={"district_data": self.state.district_stats,
@@ -124,9 +120,7 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
         # 从任务输出列表中提取结果
         if hasattr(district_chart_result, 'tasks_output') and len(district_chart_result.tasks_output) > 0:
             if hasattr(district_chart_result.tasks_output[0], 'pydantic'):
-                self.state.district_chart['chart_url'] = district_chart_result.tasks_output[0].pydantic.chart_url
-                self.state.district_chart['title'] = district_chart_result.tasks_output[0].pydantic.title
-                self.state.district_chart['description'] = district_chart_result.tasks_output[0].pydantic.description
+                self.state.district_chart = district_chart_result.tasks_output[0].pydantic
         
         # EV violations chart
         # ev_chart_result = viz_crew.crew().kickoff(
@@ -134,9 +128,7 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
         # )
         if hasattr(district_chart_result, 'tasks_output') and len(district_chart_result.tasks_output) > 0:
             if hasattr(district_chart_result.tasks_output[1], 'pydantic'):
-                self.state.ev_violations_chart['chart_url']  = district_chart_result.tasks_output[1].pydantic.chart_url
-                self.state.ev_violations_chart['title'] = district_chart_result.tasks_output[1].pydantic.title
-                self.state.ev_violations_chart['description'] = district_chart_result.tasks_output[1].pydantic.description
+                self.state.ev_violations_chart = district_chart_result.tasks_output[1].pydantic
         
         # Garbage stats chart
         # garbage_chart_result = viz_crew.crew().kickoff(
@@ -144,9 +136,7 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
         # )
         if hasattr(district_chart_result, 'tasks_output') and len(district_chart_result.tasks_output) > 0:
             if hasattr(district_chart_result.tasks_output[2], 'pydantic'):
-                self.state.garbage_stats_chart['chart_url']  = district_chart_result.tasks_output[2].pydantic.chart_url
-                self.state.garbage_stats_chart['title'] = district_chart_result.tasks_output[2].pydantic.title
-                self.state.garbage_stats_chart['description'] = district_chart_result.tasks_output[2].pydantic.description
+                self.state.garbage_stats_chart = district_chart_result.tasks_output[2].pydantic
         
         # Garbage sources chart
         # sources_chart_result = viz_crew.crew().kickoff(
@@ -154,58 +144,64 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
         # )
         if hasattr(district_chart_result, 'tasks_output') and len(district_chart_result.tasks_output) > 0:
             if hasattr(district_chart_result.tasks_output[3], 'pydantic'):
-                self.state.garbage_sources_chart['chart_url']  = district_chart_result.tasks_output[3].pydantic.chart_url
-                self.state.garbage_sources_chart['title'] = district_chart_result.tasks_output[3].pydantic.title
-                self.state.garbage_sources_chart['description'] = district_chart_result.tasks_output[3].pydantic.description
+                self.state.garbage_sources_chart = district_chart_result.tasks_output[3].pydantic
         
         print("Visualizations created")
-
 
     @listen(create_visualizations)
     async def write_report_sections(self):
         print("Writing Report Sections")
         
-        report_crew = ReportWritingCrew()
+        viz_crew = VisualizationCrew()
         interpretation = self.state.data_interpretation
         
         # Write section 1
-        section1_result = report_crew.crew().kickoff(
+        section1_result = viz_crew.crew().kickoff(
             inputs={
                 "district_data": self.state.district_stats,
-                "district_data_chart_data": self.state.district_chart,
-                "interpretation": interpretation,
-                 "communities": self.state.ev_violations,
-                "communities_chart_data": self.state.ev_violations_chart,
-                 "community_data": self.state.garbage_stats,
-                "community_data_chart_data": self.state.garbage_stats_chart,
-                 "source_data": self.state.garbage_sources,
-                "source_data_chart_data": self.state.garbage_sources_chart
+                "chart_data": self.state.district_chart,
+                "interpretation": interpretation
             }
         )
         if hasattr(section1_result, 'tasks_output') and len(section1_result.tasks_output) > 0:
             if hasattr(section1_result.tasks_output[0], 'pydantic'):
-                self.state.section_1['title'] = section1_result.tasks_output[0].pydantic.title
-                self.state.section_1['content'] = section1_result.tasks_output[0].pydantic.content
-                self.state.section_1['chart_data']=self.state.district_chart
+                self.state.section_1 = section1_result.tasks_output[0].pydantic
         
-        if hasattr(section1_result, 'tasks_output') and len(section1_result.tasks_output) > 0:
-            if hasattr(section1_result.tasks_output[1], 'pydantic'):
-                self.state.section_2['title'] = section1_result.tasks_output[1].pydantic.title
-                self.state.section_2['content'] = section1_result.tasks_output[1].pydantic.content
-                self.state.section_2['chart_data'] = self.state.ev_violations_chart
+        # Write section 2
+        section2_result = viz_crew.crew().kickoff(
+            inputs={
+                "communities": self.state.ev_violations,
+                "chart_data": self.state.ev_violations_chart,
+                "interpretation": interpretation
+            }
+        )
+        if hasattr(section2_result, 'tasks_output') and len(section2_result.tasks_output) > 0:
+            if hasattr(section2_result.tasks_output[0], 'pydantic'):
+                self.state.section_2 = section2_result.tasks_output[0].pydantic
         
-    
-        if hasattr(section1_result, 'tasks_output') and len(section1_result.tasks_output) > 0:
-            if hasattr(section1_result.tasks_output[2], 'pydantic'):
-                self.state.section_3['title'] = section1_result.tasks_output[2].pydantic.title
-                self.state.section_3['content'] = section1_result.tasks_output[2].pydantic.content
-                self.state.section_3['chart_data'] = self.state.garbage_stats_chart
+        # Write section 3
+        section3_result = viz_crew.crew().kickoff(
+            inputs={
+                "community_data": self.state.garbage_stats,
+                "chart_data": self.state.garbage_stats_chart,
+                "interpretation": interpretation
+            }
+        )
+        if hasattr(section3_result, 'tasks_output') and len(section3_result.tasks_output) > 0:
+            if hasattr(section3_result.tasks_output[0], 'pydantic'):
+                self.state.section_3 = section3_result.tasks_output[0].pydantic
         
-        if hasattr(section1_result, 'tasks_output') and len(section1_result.tasks_output) > 0:
-            if hasattr(section1_result.tasks_output[3], 'pydantic'):
-                self.state.section_4['title'] = section1_result.tasks_output[3].pydantic.title
-                self.state.section_4['content'] = section1_result.tasks_output[3].pydantic.content
-                self.state.section_4['chart_data'] = self.state.garbage_sources_chart
+        # Write section 4
+        section4_result = viz_crew.crew().kickoff(
+            inputs={
+                "source_data": self.state.garbage_sources,
+                "chart_data": self.state.garbage_sources_chart,
+                "interpretation": interpretation
+            }
+        )
+        if hasattr(section4_result, 'tasks_output') and len(section4_result.tasks_output) > 0:
+            if hasattr(section4_result.tasks_output[0], 'pydantic'):
+                self.state.section_4 = section4_result.tasks_output[0].pydantic
         
         print("Report sections completed")
 
@@ -213,10 +209,10 @@ class PingshanHotlineReportFlow(Flow[ReportState]):
     async def compile_final_report(self):
         print("Compiling Final Report")
         
-        report_crew = ReportWritingFinalCrew()
+        viz_crew = VisualizationCrew()
         
         # Compile final report
-        final_report_result = report_crew.crew().kickoff(
+        final_report_result = viz_crew.crew().kickoff(
             inputs={
                 "section_1": self.state.section_1,
                 "section_2": self.state.section_2,
